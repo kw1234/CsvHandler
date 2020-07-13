@@ -1,0 +1,10 @@
+<mat-card>
+  <mat-form-field>
+    <input matInput [(ngModel)]="fileData.path" placeholder="Url">
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="fileInput()">Upload</button>
+  <br>
+  <span>Upload Profile Picture:</span>   
+  <input type="file" (change)="handleFileInput($event.target.files)">
+</mat-card>
+
