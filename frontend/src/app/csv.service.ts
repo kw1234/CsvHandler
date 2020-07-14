@@ -22,13 +22,6 @@ export class CsvService {
     BASE_URL = 'http://localhost:8080/api';
 
     uploadFile(fileData) {
-        //console.log(fileData);
-	//const formData: FormData = new FormData();
-        //formData.append('fileKey', fileData, fileData.name);
-	//console.log(formData);
-
-
-
 	let formData:FormData = new FormData();
         formData.append('file', fileData, fileData.name);
         let headers = new Headers();
