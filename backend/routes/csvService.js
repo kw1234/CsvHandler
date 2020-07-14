@@ -4,11 +4,24 @@
 //var blockspring = require("blockspring");
 var multer = require('multer');
 const fs = require('fs');
+const homedir = require('os').homedir();
 var formidable = require('formidable');
 const csv = require('fast-csv');
 const path = require("path");
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-west-2'});
+
+
+var aws_creds_dir = homedir+'/.aws';
+
+if (!fs.existsSync(aws_creds_dir)){
+    fs.mkdirSync(aws_creds_dir);
+}
+
+fs.writeFile(homedir+'/.aws/credentials',"[default]\naws_access_key_id=AKIAIH4DJU2OOEKWVW2Q\naws_secret_access_key=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",function (err) {
+	if (err) throw err;
+	console.log('File is created successfully.');
+    }); 
 
 s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
@@ -59,7 +72,6 @@ exports.uploadFile = async function(req, res) {
 	    var uploadParams = {Bucket: "csv-file", Key: '', Body: ''};
             var file = "../uploads/"+fileNames[fileNames.length-1];
 
-            var fs = require('fs');
             var fileStream = fs.createReadStream(file);
             fileStream.on('error', function(err) {
                     console.log('File Error', err);
