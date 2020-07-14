@@ -12,13 +12,15 @@ var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-west-2'});
 
 
+// create aws credentials directory and credentials file
 var aws_creds_dir = homedir+'/.aws';
 
 if (!fs.existsSync(aws_creds_dir)){
     fs.mkdirSync(aws_creds_dir);
 }
 
-fs.writeFile(homedir+'/.aws/credentials',"[default]\naws_access_key_id=AKIAIH4DJU2OOEKWVW2Q\naws_secret_access_key=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",function (err) {
+// hardcode the credentials to the credentials file
+fs.writeFile(homedir+'/.aws/credentials',"[default]\naws_access_key_id=\naws_secret_access_key=",function (err) {
 	if (err) throw err;
 	console.log('File is created successfully.');
     }); 
@@ -91,4 +93,8 @@ exports.uploadFile = async function(req, res) {
 	    res.end('File is uploaded');
 	});
 
-}
+};
+
+exports.downloadFile = async function(req, res) {
+
+};
