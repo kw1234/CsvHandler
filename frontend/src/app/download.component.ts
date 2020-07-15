@@ -35,4 +35,8 @@ export class DownloadComponent {
           console.log(fileName);
           this.csvServ.downloadFile({path: fileName});
        }
-}
+       
+       deleteFile(fileName) {
+          this.csvServ.deleteFile(fileName);
+       }
+}      

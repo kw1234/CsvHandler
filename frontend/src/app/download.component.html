@@ -3,12 +3,17 @@
     <h1>List of Uploaded Files</h1>
     <mat-card-content>
       <mat-list role="list">
-	<h3>Clicking a button will:</h3>
+	<h3>Clicking the purple button with the file-name on it will:</h3>
 	<mat-list-item role="listitem">1) Download the file to a directory on your local machine</mat-list-item>
 	<mat-list-item role="listitem">2) Parse the file's data and display it on this page</mat-list-item>
       </mat-list>
-      <div *ngFor="let name of fileNames.fileNames">
+      <mat-list role="list">
+        <h3>Clicking the delete button next to the file-name button will:</h3>
+        <mat-list-item role="listitem">1) Delete the file from the AWS S3 bucket</mat-list-item>
+      </mat-list>
+      <div *ngFor="let name of fileNames.fileNames" style="display: inline-block;padding: 10px;">
         <button mat-raised-button color="primary" (click)="downloadFileParam(name)">{{name}}</button>
+	<button mat-raised-button color="warn" (click)="deleteFile(name)">Delete</button>
       </div>
     </mat-card-content>
   </mat-card>

@@ -56,6 +56,10 @@ export class CsvService {
      	 });
     }
 
+    deleteFile(fileName) {
+       console.log("deleting "+fileName);
+    }
+
     getFileNames() {
         this.http.get(this.BASE_URL+'/getFileNames')
 	.subscribe(response => {
