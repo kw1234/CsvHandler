@@ -7,6 +7,7 @@ const fs = require('fs');
 const homedir = require('os').homedir();
 var formidable = require('formidable');
 const csv = require('fast-csv');
+//const csv = require('csv-parser');
 const path = require("path");
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-west-2'});
@@ -69,6 +70,8 @@ const storage = multer.diskStorage({
 
 let upload = multer({dest: './uploads/', storage: storage}).single('file');
 
+var fileRows = [];
+
 exports.uploadFile = async function(req, res) {
     console.log("uploading attempt");
     //console.log(req.file);
@@ -87,9 +90,9 @@ exports.uploadFile = async function(req, res) {
 
             var fileStream = fs.createReadStream(file);
 
-            uploadParams.Body = file;
+            uploadParams.Body = fileStream;
             var path = require('path');
-            uploadParams.Key = fileNames[fileNames.length-1] + Date.now();
+            uploadParams.Key = Date.now() +"-"+ fileNames[fileNames.length-1];
 
             s3.upload (uploadParams, function (err, data) {
                     if (err) {
@@ -107,6 +110,7 @@ exports.uploadFile = async function(req, res) {
 exports.downloadFile = async function(req, res) {
     console.log(req.body);
     var fileKey = req.body.path;
+    
 
     console.log('Trying to download file', fileKey);
 
@@ -116,22 +120,38 @@ exports.downloadFile = async function(req, res) {
     };
 
     res.attachment(fileKey);
-    s3.getObject(options, function(err, res) {
+    s3.getObject(options, function(err, data) {
 	    if (err === null) {
 		//res.attachment('file.ext'); // or whatever your logic needs
-		console.log(res);
-		fs.writeFile("./downloads/"+fileKey,res.Body,function (err) {                                                                                                                 
+		console.log(data);
+		fs.writeFileSync("./downloads/"+fileKey,data.Body,function (err) {                                                                                                                 
 			if (err) console.log("Error", err);
 			
 			console.log('File successfully written to /downloads.');
 		    });
+
+		fileRows = [];
+		fs.createReadStream(path.resolve('./downloads/'+fileKey))
+		    .pipe(csv.parse({ headers: true }))
+		    .on('error', error => console.error(error))
+		    .on('data', row => {
+			    //console.log(row);
+			    fileRows.push(row);
+			})
+		    .on('end', rowCount => {
+			    console.log(fileRows);
+			    res.send({"fileRows":fileRows});
+			    console.log(`Parsed ${rowCount} rows`)
+			});
+		//console.log(fileRows);
+		//res.send(data);
 		//res.send("OK");
 	    } else {
-		res.status(500).send(err);
+		data.status(500).send(err);
 	    }
 	});
-    var fileStream = s3.getObject(options).createReadStream();
-    fileStream.pipe(res);
+    //var fileStream = s3.getObject(options).createReadStream();
+    //fileStream.pipe(res);
 };
 
 exports.getFileNames = async function(req, res) {

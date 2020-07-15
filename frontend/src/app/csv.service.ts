@@ -51,12 +51,8 @@ export class CsvService {
     downloadFile(downloadData) {
         this.http.post(this.BASE_URL+'/download', downloadData)
         .subscribe(response => {
-               console.log(response);
-               //this.textStore = [response.json()];
-               //this.textSubject.next(this.textStore);
-           }, error => {
-              console.log(`unable to upload file with error: ${error}`);
-           });
+               console.log(response.json());
+     	 });
     }
 
     getFileNames() {
