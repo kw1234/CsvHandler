@@ -53,4 +53,16 @@ export class CsvService {
            });
     }
 
+    getFileNames() {
+        this.http.get(this.BASE_URL+'/getFileNames')
+	.subscribe(response => {
+	   console.log(response);
+	   this.textStore = [response.json()];
+           this.textSubject.next(this.textStore);
+	   console.log(this.textStore);
+	}, error => {
+	   console.log(`unable to get file names with error: ${error}`);
+	});
+    }
+
 }

@@ -14,13 +14,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import {UploadComponent} from './upload.component';
+import {DownloadComponent} from './download.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {CsvService} from './csv.service';
 
 @NgModule({
   declarations: [
-    AppComponent, UploadComponent
+    AppComponent, UploadComponent, DownloadComponent
   ],
   imports: [
     BrowserModule,

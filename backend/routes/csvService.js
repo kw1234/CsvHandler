@@ -35,6 +35,17 @@ s3.listBuckets(function(err, data) {
 	}
     });
 
+var params = {
+    Bucket: "csv-file"
+};
+var allKeys = [];
+s3.listObjects(params, function(err, data) {
+	if (err) console.log(err, err.stack); // an error occurred
+	else     console.log(data.Contents);
+        data.Contents.forEach(elem => allKeys.push(elem.Key));
+	console.log(allKeys);
+    });
+
 
 var topWordsStore = {};
 var textStore = "";
@@ -122,3 +133,17 @@ exports.downloadFile = async function(req, res) {
     var fileStream = s3.getObject(options).createReadStream();
     fileStream.pipe(res);
 };
+
+exports.getFileNames = async function(req, res) {
+
+    var allKeys = [];
+    s3.listObjects(params, function(err, data) {
+	    if (err) console.log(err, err.stack); // an error occurred                                                                                                                                                                  
+	    else     console.log(data.Contents);
+	    data.Contents.forEach(elem => allKeys.push(elem.Key));
+	    console.log(allKeys);
+	    res.send({"fileNames": allKeys});
+	});
+    //res.send({"fileNames": allKeys});
+
+}

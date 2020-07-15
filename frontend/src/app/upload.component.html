@@ -2,9 +2,5 @@
   <input type="file" (change)="handleFileInput($event.target.files)">
   <button mat-raised-button color="primary" (click)="fileInput()">Upload</button>
   <br>
-  <mat-form-field>
-    <input matInput [(ngModel)]="downloadData.path" placeholder="Url">
-  </mat-form-field>
-  <button mat-raised-button color="primary" (click)="downloadFile()">Download</button>
 </mat-card>
 

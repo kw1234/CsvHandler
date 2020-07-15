@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-form-field>
+    <input matInput [(ngModel)]="downloadData.path" placeholder="Url">
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="downloadFile()">Download</button>
+  <button mat-raised-button color="primary" (click)="getFileNames()">List Files</button>
+</mat-card>
+
+<div *ngFor="let text of csvServ.text | async">
+  <mat-card class="card">
+    <mat-card-content>
+      <div *ngFor="let word of text.fileNames">
+	{{word}}
+        <button mat-raised-button color="primary" (click)="getFileNames()">{{word[0]}}</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="card">
+    <!--<div [innerHTML]="text.text"></div>-->
+    <!-- <p>{{text.text}}</p> -->
+    <!-- <mat-card-content> {{text.text}} </mat-card-content> -->
+  </mat-card>
+</div>

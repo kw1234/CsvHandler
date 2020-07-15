@@ -34,6 +34,8 @@ api.post('/upload', csvService.uploadFile);
 
 api.post('/download', csvService.downloadFile);
 
+api.get('/getFileNames', csvService.getFileNames);
+
 app.use('/api', api);
 
 app.listen(8080);
