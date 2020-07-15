@@ -10,6 +10,8 @@ export class DownloadComponent {
 
        constructor(public csvServ: CsvService) {}
 
+       ngOnInit() { this.getFileNames(); }
+
        downloadData = {
            path: ''
        }

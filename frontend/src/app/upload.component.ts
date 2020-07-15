@@ -30,8 +30,7 @@ export class UploadComponent {
 	  this.fileToUpload = files.item(0);
        }
 
-       downloadFile() {
-          console.log(this.downloadData);
-          this.csvServ.downloadFile(this.downloadData);
+       getFileNames() {
+         this.csvServ.getFileNames();
        }
 }

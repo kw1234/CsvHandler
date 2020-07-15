@@ -42,6 +42,7 @@ export class CsvService {
                console.log(response);
                //this.textStore = [response.json()];
                //this.textSubject.next(this.textStore);
+	       this.getFileNames();
            }, error => {
               console.log(`unable to upload file with error: ${error}`);
            });
