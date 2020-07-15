@@ -28,4 +28,9 @@ export class DownloadComponent {
          console.log(this.downloadData);
           this.csvServ.downloadFile(this.downloadData);
        }
+
+       downloadFileParam(fileName) {
+          console.log(fileName);
+          this.csvServ.downloadFile({path: fileName});
+       }
 }

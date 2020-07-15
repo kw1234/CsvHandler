@@ -6,12 +6,11 @@
   <button mat-raised-button color="primary" (click)="getFileNames()">List Files</button>
 </mat-card>
 
-<div *ngFor="let text of csvServ.text | async">
+<div *ngFor="let fileNames of csvServ.fileNames | async">
   <mat-card class="card">
     <mat-card-content>
-      <div *ngFor="let word of text.fileNames">
-	{{word}}
-        <button mat-raised-button color="primary" (click)="getFileNames()">{{word[0]}}</button>
+      <div *ngFor="let name of fileNames.fileNames">
+        <button mat-raised-button color="primary" (click)="downloadFileParam(name)">{{name}}</button>
       </div>
     </mat-card-content>
   </mat-card>

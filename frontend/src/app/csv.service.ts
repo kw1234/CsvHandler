@@ -11,6 +11,12 @@ import { Subject } from 'rxjs';
 @Injectable()
 export class CsvService {
 
+    private fileNamesStore = [];
+
+    private fileNamesSubject = new Subject();
+
+    fileNames = this.fileNamesSubject.asObservable();
+
     private textStore = [];
 
     private textSubject = new Subject();
@@ -57,9 +63,9 @@ export class CsvService {
         this.http.get(this.BASE_URL+'/getFileNames')
 	.subscribe(response => {
 	   console.log(response);
-	   this.textStore = [response.json()];
-           this.textSubject.next(this.textStore);
-	   console.log(this.textStore);
+	   this.fileNamesStore = [response.json()];
+           this.fileNamesSubject.next(this.fileNamesStore);
+	   console.log(this.fileNamesStore);
 	}, error => {
 	   console.log(`unable to get file names with error: ${error}`);
 	});
