@@ -32,6 +32,8 @@ app.get('/', function(req, res) {
 
 api.post('/upload', csvService.uploadFile);
 
+api.post('/download', csvService.downloadFile);
+
 app.use('/api', api);
 
 app.listen(8080);

@@ -10,7 +10,7 @@ export class UploadComponent {
 
        constructor(public csvServ: CsvService) {}
 
-       fileData = {
+       downloadData = {
            path: ''
        }
 
@@ -21,7 +21,6 @@ export class UploadComponent {
        }
 
        fileInput() {
-          //this.csvServ.uploadFile(this.fileData);
 	  console.log(this.fileToUpload);
 	  this.csvServ.uploadFile(this.fileToUpload);
        }
@@ -29,6 +28,10 @@ export class UploadComponent {
        handleFileInput(files: FileList) {
           //console.log(files);
 	  this.fileToUpload = files.item(0);
-          //this.fileData.path = data.target.value;
+       }
+
+       downloadFile() {
+          console.log(this.downloadData);
+          this.csvServ.downloadFile(this.downloadData);
        }
 }

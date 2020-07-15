@@ -20,10 +20,10 @@ if (!fs.existsSync(aws_creds_dir)){
 }
 
 // hardcode the credentials to the credentials file
-fs.writeFile(homedir+'/.aws/credentials',"[default]\naws_access_key_id=\naws_secret_access_key=",function (err) {
+/*fs.writeFile(homedir+'/.aws/credentials',"[default]\naws_access_key_id=\naws_secret_access_key=",function (err) {
 	if (err) throw err;
 	console.log('File is created successfully.');
-    }); 
+	}); */
 
 s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
@@ -72,12 +72,10 @@ exports.uploadFile = async function(req, res) {
 	    console.log(fileNames);
 
 	    var uploadParams = {Bucket: "csv-file", Key: '', Body: ''};
-            var file = "../uploads/"+fileNames[fileNames.length-1];
+            var file = "./uploads/"+fileNames[fileNames.length-1];
 
             var fileStream = fs.createReadStream(file);
-            fileStream.on('error', function(err) {
-                    console.log('File Error', err);
-		});
+
             uploadParams.Body = file;
             var path = require('path');
             uploadParams.Key = fileNames[fileNames.length-1] + Date.now();
@@ -96,5 +94,31 @@ exports.uploadFile = async function(req, res) {
 };
 
 exports.downloadFile = async function(req, res) {
+    console.log(req.body);
+    var fileKey = req.body.path;
 
+    console.log('Trying to download file', fileKey);
+
+    var options = {
+        Bucket    : 'csv-file',
+        Key    : fileKey,
+    };
+
+    res.attachment(fileKey);
+    s3.getObject(options, function(err, res) {
+	    if (err === null) {
+		//res.attachment('file.ext'); // or whatever your logic needs
+		console.log(res);
+		fs.writeFile("./downloads/"+fileKey,res.Body,function (err) {                                                                                                                 
+			if (err) console.log("Error", err);
+			
+			console.log('File successfully written to /downloads.');
+		    });
+		//res.send("OK");
+	    } else {
+		res.status(500).send(err);
+	    }
+	});
+    var fileStream = s3.getObject(options).createReadStream();
+    fileStream.pipe(res);
 };
