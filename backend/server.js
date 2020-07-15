@@ -1,3 +1,7 @@
+// needed to load aws credentials for the s3 storage
+require('dotenv').config({path: __dirname + '/credentials.env'});
+
+
 var express = require('express');
 const path = require("path");
 const app = express();
@@ -9,14 +13,15 @@ app.use(bodyParser.json());
 
 var router = express.Router();
 
+
 router.get('/', function(req, res, next) {
         //createListing(req.ip);
-        //next();
-	res.send("mama");
+        next();
+	//res.send("mama");
     });
 
-//app.use('/', router);
-//app.use(express.static('frontend'));
+app.use('/', router);
+app.use(express.static('frontend'));
 
 app.use((req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
