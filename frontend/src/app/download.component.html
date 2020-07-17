@@ -1,25 +1,35 @@
-<div *ngFor="let fileNames of csvServ.fileNames | async">
-  <mat-card class="card">
+<mat-card class="card">
+  <div style="display: inline-block">
     <h1>List of Uploaded Files</h1>
-    <mat-card-content>
-      <mat-list role="list">
-	<h3>Clicking the purple button with the file-name on it will:</h3>
-	<mat-list-item role="listitem">1) Download the file to a directory on your local machine</mat-list-item>
-	<mat-list-item role="listitem">2) Parse the file's data and display it on this page</mat-list-item>
-      </mat-list>
-      <mat-list role="list">
-        <h3>Clicking the delete button next to the file-name button will:</h3>
-        <mat-list-item role="listitem">1) Delete the file from the AWS S3 bucket</mat-list-item>
-      </mat-list>
-      <div *ngFor="let name of fileNames.fileNames" style="display: inline-block;padding: 10px;">
-        <button mat-raised-button color="primary" (click)="downloadFileParam(name)">{{name}}</button>
-	<button mat-raised-button color="warn" (click)="deleteFile(name)">Delete</button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <mat-card class="card">
-    <!--<div [innerHTML]="text.text"></div>-->
-    <!-- <p>{{text.text}}</p> -->
-    <!-- <mat-card-content> {{text.text}} </mat-card-content> -->
-  </mat-card>
-</div>
+    Refresh File Names List
+    <button matToolTip="Refresh" mat-icon-button (click)="getFileNames()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+  <mat-card-content>
+    <mat-list role="list">
+      <h3>Clicking the purple button with the file-name on it will:</h3>
+      <mat-list-item role="listitem">1) Download the file to a directory on your local machine</mat-list-item>
+      <mat-list-item role="listitem">2) Parse the file's data and display it on this page</mat-list-item>
+    </mat-list>
+    <mat-list role="list">
+      <h3>Clicking the delete button next to the file-name button will:</h3>
+      <mat-list-item role="listitem">1) Delete the file from the AWS S3 bucket</mat-list-item>
+    </mat-list>
+  </mat-card-content>
+</mat-card>
+<mat-card class="card">
+  <div *ngFor="let fileNames of csvServ.fileNames | async">
+    <div *ngFor="let name of fileNames.fileNames" style="display: inline-block;padding: 10px;">
+      <button mat-raised-button color="primary" (click)="downloadFileParam(name)">{{name}}</button>
+      <button mat-raised-button color="warn" (click)="deleteFile(name)">Delete</button>
+    </div>
+  </div>
+  <fileTable></fileTable>
+  <mat-progress-bar mode="indeterminate" *ngIf="csvServ.loading"></mat-progress-bar>
+  <mat-spinner *ngIf="csvServ.loading"></mat-spinner>
+  <!--<div [innerHTML]="text.text"></div>-->
+  <!-- <p>{{text.text}}</p> -->
+  <!-- <mat-card-content> {{text.text}} </mat-card-content> -->
+</mat-card>
+
