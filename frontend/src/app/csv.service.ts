@@ -5,32 +5,11 @@ import { map } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 //import 'rxjs/add/operator/map';
 //import {Observable} from 'rxjs/Rx';
-
+import {timeout} from 'rxjs/operators';
 'rxjs/Rx';
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
-];
 
 @Injectable()
 export class CsvService {
-    dataSource = ELEMENT_DATA;
 
     resultsLength = 0;
     isLoadingResults = false;
@@ -40,14 +19,6 @@ export class CsvService {
     private fileNamesSubject = new Subject();
     fileNames = this.fileNamesSubject.asObservable();
 
-    private textStore = [];
-    private textSubject = new Subject();
-    text = this.textSubject.asObservable();
-
-    private fileRowsStore = [];
-    private fileRowsSubject = new Subject();
-    fileRows = this.fileRowsSubject.asObservable();
-
     private dictRowsStore = [];
     private dictRowsSubject = new Subject();
     dictRows = this.dictRowsSubject.asObservable();
@@ -56,9 +27,13 @@ export class CsvService {
     private colNamesSubject = new Subject();
     colNames = this.colNamesSubject.asObservable();
 
+    private pageDataStore = {};
+    private pageDataSubject = new Subject();
+    pageData = this.pageDataSubject.asObservable();
+
     constructor(private http: Http) {}
 
-    BASE_URL = 'http://localhost:8080/api';
+    BASE_URL = 'https://cvshandler.wl.r.appspot.com/api';
 
     loading = false;
 
@@ -87,14 +62,11 @@ export class CsvService {
     downloadFile(downloadData) {
         this.loading = true;
         this.http.post(this.BASE_URL+'/download', downloadData)
+	.pipe(timeout(60000))
         .subscribe(response => {
                let dict = response.json();
-	       this.textStore = [dict];
-               this.textSubject.next(this.textStore);
-
-	       this.fileRowsStore = dict.fileRows;
-               this.fileRowsSubject.next(this.fileRowsStore);
-	       this.resultsLength = dict.fileRows.length;
+	       console.log(dict);
+	       this.resultsLength = dict.rowCount;
 
 	       this.colNamesStore = dict.colNames;
 	       this.colNamesSubject.next(this.colNamesStore);
@@ -102,13 +74,41 @@ export class CsvService {
 	       this.dictRowsStore = dict.dictRows;
                this.dictRowsSubject.next(this.dictRowsStore);
 
-	       console.log(this.textStore);
 	       this.loading = false;
-     	 });
+     	 },  error => {
+              console.log(`unable to download file with error: ${error}`);
+           });
+    }
+
+    downloadFileGet(downloadData) {
+        this.loading = true;
+        this.http.get(this.BASE_URL+'/download', downloadData)
+        .subscribe(response => {
+               let dict = response.json();
+               console.log(dict);
+               this.resultsLength = dict.fileRows.length;
+
+               this.colNamesStore = dict.colNames;
+               this.colNamesSubject.next(this.colNamesStore);
+
+               this.dictRowsStore = dict.dictRows;
+               this.dictRowsSubject.next(this.dictRowsStore);
+
+               this.loading = false;
+         },  error => {
+              console.log(`unable to download file with error: ${error}`);
+           });
     }
 
     deleteFile(fileName) {
        console.log("deleting "+fileName);
+       this.http.post(this.BASE_URL+'/delete', {"fileName": fileName})
+        .subscribe(response => {
+               console.log(response);
+	       this.getFileNames();
+           }, error => {
+              console.log(`unable to delete file with error: ${error}`);
+           });
     }
 
     getFileNames() {
@@ -121,6 +121,27 @@ export class CsvService {
 	}, error => {
 	   console.log(`unable to get file names with error: ${error}`);
 	});
+    }
+
+    getPageData(index) {
+       console.log(index);
+       if (index > this.dictRowsStore.length-1) {
+          console.log("Error: index out of dictRowsStore bounds");
+	  return [];
+       }
+       return this.dictRowsStore[index];
+    }
+
+    getPageReq(index) {
+       console.log(index);
+       this.http.post(this.BASE_URL+'/getPage', {"index": index})
+        .subscribe(response => {
+           console.log(response);
+           this.pageDataStore = response.json();
+           this.pageDataSubject.next(this.pageDataStore);
+        }, error => {
+           console.log(`unable to get page data with error: ${error}`);
+        });
     }
 
 }

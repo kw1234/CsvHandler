@@ -41,6 +41,10 @@ api.post('/download', csvService.downloadFile);
 
 api.get('/getFileNames', csvService.getFileNames);
 
+api.post('/delete', csvService.deleteFile);
+
+api.post('/getPage', csvService.getPage);
+
 app.use('/api', api);
 
 app.listen(8080);

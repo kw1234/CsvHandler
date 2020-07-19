@@ -1,4 +1,5 @@
-<mat-table [dataSource]="csvServ.dictRows" class="mat-elevation-z8">
+<div style="position: relative; min-height: 200px;">
+<mat-table [dataSource]="csvServ.pageData" class="mat-elevation-z8" style="position: relative; max-height: 400px; overflow: auto;">
   <!--<div *ngfor="let name of csvServ.colNames">
     <ng-container matColumnDef="name">
       <mat-header-cell *matHeaderCellDef> {{name}} </mat-header-cell>
@@ -64,15 +65,6 @@
   <mat-header-row *matHeaderRowDef="csvServ.colNames | async"></mat-header-row>
   <mat-row *matRowDef="let row; columns: csvServ.colNames | async;"></mat-row>
 </mat-table>
-<!--
-  <mat-table [dataSource]="csvServ.dictRows | async" class="mat-elevation-z8">
-    <ng-container matColumnDef="state">
-      <mat-header-cell *matHeaderCellDef> State </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.state}} </mat-cell>
-    </ng-container> 
-    
-    <mat-header-row *matHeaderRowDef="csvServ.colNames | async"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: csvServ.colNames | async;"></mat-row> 
-  </mat-table>
-  
-  <!--<mat-paginator [length]="csvServ.resultsLength" [pageSize]="30"></mat-paginator>-->
+ 
+<mat-paginator [length]="csvServ.resultsLength" [pageSize]="30" (page)="onPageFired($event)"></mat-paginator>
+</div>

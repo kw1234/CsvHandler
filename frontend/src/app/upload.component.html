@@ -1,7 +1,7 @@
 <mat-card>
   <h1>Upload Files to AWS S3 Below</h1>
   <input type="file" (change)="handleFileInput($event.target.files)">
-  <button mat-raised-button color="primary" (click)="fileInput();getFileNames;">Upload</button>
+  <button mat-raised-button color="primary" (click)="fileInput();getFileNames();">Upload</button>
   <br>
 </mat-card>
 

@@ -46,16 +46,13 @@ let upload = multer({dest: '/tmp', storage: storage}).single('file');
 
 exports.uploadFile = async function(req, res) {
     console.log("uploading attempt");
-    //console.log(req.file);
     upload(req, res, function (err) {
 	    if (err) {
-		console.log("erraaa "+err.field);
+		console.log(err.field);
 		return res.end(err.toString());
 	    }
 
 	    const fileRows = [];
-	    console.log(files);
-	    console.log(fileNames);
 
 	    var uploadParams = {Bucket: "csv-file", Key: '', Body: ''};
             var file = "/tmp/"+fileNames[fileNames.length-1];
@@ -81,11 +78,10 @@ exports.uploadFile = async function(req, res) {
 
 var colNames = [];
 var fileRows = [];
+var dictRows = {};
 
 exports.downloadFile = async function(req, res) {
-    console.log(req.body);
     var fileKey = req.body.path;
-    
 
     console.log('Trying to download file', fileKey);
 
@@ -95,34 +91,57 @@ exports.downloadFile = async function(req, res) {
     };
 
     res.attachment(fileKey);
-    s3.getObject(options, function(err, data) {
-	    if (err === null) {
-		console.log(data);
-		// want to see if I can bypass this to speed up the download
-		fs.writeFileSync("/tmp/"+fileKey,data.Body,function (err) {                                                                                                                 
-			if (err) console.log("Error", err);
-			
-			console.log('File successfully written to /downloads.');
-			});
+    var s3FileData = {};
+    
+    s3.getObject(options).promise()
+    .then(function(response) {
+	    return response;
+	})
+    .then(function(file) {
+	    fs.writeFileSync("/tmp/"+fileKey,file.Body,function (err) {                                                                                                                                                         
+		    if (err) console.log("Error", err);
+		    console.log('File successfully written to /tmp.');               
+		}); 
+	    return "/tmp/"+fileKey;
+	})
+    .then(function(filePath) {
+	    colNames = [];                                                                                                                                                                                                           
+	    fileRows = [];                                                                                                                                                                                                           
+	    dictRows = [];                                                                                                                                                                                                           
+	    text = "";                                                                                                                                                                                                               
+            
+	    index = 0;                                                                                                                                                                                                               
+	    pageLimit = 30;                                                                                                                                                                                                          
+	    pageRows = [];
 
-		fileRows = [];
-		dictRows = [];
-		fs.createReadStream(path.resolve('/tmp/'+fileKey))
-		    .pipe(csv.parse({ headers: true }))
-		    .on('error', error => console.error(error))
-		    .on('data', row => {
-			    colNames = Object.keys(row);
-			    fileRows.push(Object.values(row));
-			    dictRows.push(row);
-			})
-		    .on('end', rowCount => {
-			    res.send({"colNames": colNames, "fileRows":fileRows, "dictRows":dictRows});
-			    console.log(`Parsed ${rowCount} rows`)
-			});
-	    } else {
-		res.send(err);
-	    }
+	    var readStream = fs.createReadStream(filePath);
+
+	    fs.createReadStream(path.resolve(filePath))
+		.pipe(csv.parse({ headers: true }))
+		.on('error', error => console.error(error))
+		.on('data', row => {
+			colNames = Object.keys(row);
+			fileRows.push(Object.values(row));
+			if (pageRows.length >= pageLimit) {
+			    dictRows[index] = pageRows;
+			    index++;
+			    pageRows = [];
+			} else {
+			    pageRows.push(row);
+			}
+			dictRows[index] = pageRows;
+		    })
+		.on('end', rowCount => {
+			res.send({"colNames": colNames, "dictRows":dictRows[0], "rowCount":rowCount});
+			console.log(`Parsed ${rowCount} rows`);
+		    });
+	})
+    .catch(function(error) {
+	    console.log("Failed!", error);
+	    throw error;
+	    res.send("GUGU", error);
 	});
+    //res.send({"colNames": colNames, "fileRows":fileRows, "dictRows":dictRows});
 };
 
 exports.getFileNames = async function(req, res) {
@@ -137,4 +156,26 @@ exports.getFileNames = async function(req, res) {
 	    res.send({"fileNames": allKeys});
 	});
 
+};
+
+exports.deleteFile = async function(req, res) {
+    var fileName = req.body.fileName;
+    console.log(req.body);
+    
+    var params = {
+        Bucket    : 'csv-file',
+        Key    : fileName,
+    };
+
+    s3.deleteObject(params, function(err, data) {
+	    if (err) console.log(err, err.stack); // an error occurred
+	    else     console.log(data);           // successful response
+	});
+};
+
+exports.getPage = async function(req, res) {
+    var index = req.body.index;
+    console.log(index);
+    console.log("bolosa");
+    res.send(dictRows[index]);
 }
